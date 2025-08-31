@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <link rel="stylesheet" href="responsive.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เข้าสู่ระบบ</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Tahoma, sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(-45deg, #0015FF, #212227, #6a11cb, #464750);
+      background-size: 400% 400%;
+      animation: gradientBG 10s ease infinite;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .container {
+      background: rgba(0,0,0,0.7);
+      padding: 30px;
+      border-radius: 15px;
+      width: 300px;
+      text-align: center;
+      color: #fff;
+    }
+    .container h2 {
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #00c851;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #007e33;
+    }
+    .signup {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    .signup a {
+      color: #ffbb33;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>เข้าสู่ระบบ</h2>
+    <form onsubmit="login(event)">
+      <input type="text" id="username" placeholder="ชื่อผู้ใช้" required>
+      <input type="password" id="password" placeholder="รหัสผ่าน" required>
+      <button type="submit">ล็อกอิน</button>
+    </form>
+    <div class="signup">
+      ยังไม่มีบัญชี? <a href="register.html">สมัครสมาชิก</a>
+    </div>
+  </div>
+
+<script>
+  function login(e) {
+    e.preventDefault();
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    // ดึง user ที่สมัครไว้จาก localStorage
+    const user = JSON.parse(localStorage.getItem(username));
+
+    if (user && user.password === password) {
+      alert("เข้าสู่ระบบสำเร็จ");
+
+      // เก็บ user ที่ล็อกอินอยู่ตอนนี้ (เพื่อให้ fet.html ดึงไปใช้ได้)
+      localStorage.setItem("currentUser", JSON.stringify(user));
+
+      // ไปที่ fet.html
+      window.location.href = "Home.html"; 
+    } else {
+      alert("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+    }
+  }
+</script>
+</body>
+</html>

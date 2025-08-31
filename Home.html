@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROSHOP2</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Tahoma, sans-serif;
+      background:#171821;
+      color:#333;
+    }
+    /* ส่วนหัว */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #000000, #3f51b5, #2196f3);
+      animation: gradientMove 12s ease infinite;
+      border-radius: 0 0 20px 20px; /* ทำขอบโค้งล่างเล็กน้อย */
+      
+      border-bottom: 1px solid #ddd;
+      border-radius: 15px;
+      margin: 10px;
+    }
+    .menu-btn {
+      font-size: 24px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 5px 10px;
+    }
+    /* เมนูด้านข้าง */
+    .sidebar {
+      position: fixed;
+      top: 10px;
+      left: -260px;
+      width: 250px;
+      height: calc(100% - 20px);
+      background: #171821;
+      color: white;
+      transition: 0.3s;
+      padding-top: 60px;
+      border-radius: 15px;
+      margin-left: 10px;
+      z-index: 1000;
+    }
+    .sidebar a {
+      display: block;
+      padding: 15px;
+      text-decoration: none;
+      color: white;
+      font-size: 18px;
+      border-radius: 15px;
+      margin: 5px;
+    }
+    .sidebar a:hover { background: #3f51b5; }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 28px;
+      cursor: pointer;
+    }
+    .content {
+      padding: 20px;
+      margin: 10px;
+      background: #fff;
+      border-radius: 15px;
+    }
+    .sidebar.active { left: 10px; }
+
+    /* ระบบสินค้า */
+    .product { 
+      border:1px solid #ddd;
+      border-radius: 10px;
+      margin:10px 0;
+      padding:10px;
+      background:#fafafa;
+    }
+    .product img {
+      width:100%;
+      max-height:200px;
+      object-fit:cover;
+      border-radius:10px;
+      margin-bottom:10px;
+    }
+    .thumbs img {
+      width:60px;
+      height:60px;
+      object-fit:cover;
+      margin:5px;
+      cursor:pointer;
+      border-radius:5px;
+    }
+
+    /* แบบฟอร์ม */
+    input, textarea {
+      width:100%;
+      padding:8px;
+      margin:5px 0;
+      border:1px solid #ccc;
+      border-radius:5px;
+    }
+    button {
+      padding:8px 15px;
+      margin-top:10px;
+      background:#3f51b5;
+      color:#fff;
+      border:none;
+      border-radius:5px;
+      cursor:pointer;
+    }
+    button:hover { background:#2c3e9d; }
+
+    /* คอมเมนต์ */
+    .comments {
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px solid #ddd;
+    }
+    .comment {
+      background:#eee;
+      margin:5px 0;
+      padding:5px;
+      border-radius:5px;
+    }
+
+    /* ไอคอนแอดมิน */
+    .admin-icon {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background:#444;
+      color:#fff;
+      padding:10px;
+      border-radius:50%;
+      cursor:pointer;
+    }
+    .admin-panel {
+      display:none;
+      position:fixed;
+      bottom:70px;
+      right:20px;
+      background:#fff;
+      padding:20px;
+      border-radius:10px;
+      box-shadow:0 0 10px rgba(0,0,0,.3);
+      width:250px;
+    }
+  </style>
+</head>
+<body>
+<link rel="stylesheet" href="responsive.css">
+  <!-- ส่วนหัว -->
+  <div class="header">
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <h2>ROSHOP2</h2>
+  </div>
+
+  <!-- เมนูด้านข้าง -->
+  <div id="sidebar" class="sidebar">
+    <span class="close-btn" onclick="toggleMenu()">×</span>
+   <a href="#" onclick="openProfile()">โปรไฟล์</a>
+    <a href="#" onclick="showPage('home')">สินค้า</a>
+    <a href="#" onclick="showPage('add')">ลงสินค้า</a>
+    <a href="#" onclick="showPage('my')">รวมสินค้าของคุณ</a>
+    </div>
+
+  
+  <!-- เนื้อหา -->
+  <div class="content" id="home">
+    <h1>สินค้า</h1>
+    <input type="text" id="search" placeholder="ค้นหาสินค้า..." oninput="renderProducts()">
+    <div id="productList"></div>
+  </div>
+  <!-- หน้าต่างโปรไฟล์ -->
+<div id="profileModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeProfile()">&times;</span>
+    <h2 style="text-align:center;">ปรับแต่งโปรไฟล์</h2>
+
+    <!-- วงกลมอัปโหลดรูป -->
+    <div style="text-align:center; margin: 20px 0;">
+      <label for="profileImageInput">
+        <img id="profileImage" 
+             src="https://via.placeholder.com/120" 
+             alt="โปรไฟล์" 
+             style="width:120px;height:120px;border-radius:50%;cursor:pointer;border:2px solid #ccc;">
+      </label>
+      <input type="file" id="profileImageInput" accept="image/*" style="display:none">
+    </div>
+
+    <!-- ฟอร์มข้อมูล -->
+    <input type="text" id="username" placeholder="ชื่อผู้ใช้" class="input-box">
+    <input type="text" id="address" placeholder="ที่อยู่" class="input-box">
+    <input type="text" id="phone" placeholder="เบอร์โทร" class="input-box">
+    <input type="email" id="email" placeholder="อีเมล" class="input-box">
+
+    <!-- ปุ่มบันทึก -->
+    <button onclick="saveProfile()" class="save-btn">บันทึก</button>
+  </div>
+</div>
+
+<style>
+/* กล่อง modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+}
+
+/* เนื้อหา modal */
+.modal-content {
+  background: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+/* ปุ่มปิด */
+.close-btn {
+  position: absolute;
+  top: 10px; right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* กล่อง input */
+.input-box {
+  display: block;
+  width: 90%;
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+/* ปุ่มบันทึก */
+.save-btn {
+  display: block;
+  margin: 20px auto 0 auto;
+  padding: 10px 20px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.save-btn:hover {
+  background: #45a049;
+}
+</style>
+
+<script>
+// เปิด modal
+function openProfile() {
+  document.getElementById("profileModal").style.display = "block";
+}
+
+// ปิด modal
+function closeProfile() {
+  document.getElementById("profileModal").style.display = "none";
+}
+
+// อัปโหลดรูป
+document.getElementById("profileImageInput").addEventListener("change", function(e) {
+  const file = e.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(event){
+      document.getElementById("profileImage").src = event.target.result;
+    }
+    reader.readAsDataURL(file);
+  }
+});
+
+// บันทึกข้อมูลลง localStorage
+function saveProfile(){
+  const profile = {
+    username: document.getElementById("username").value,
+    address: document.getElementById("address").value,
+    phone: document.getElementById("phone").value,
+    email: document.getElementById("email").value,
+    image: document.getElementById("profileImage").src
+  };
+  localStorage.setItem("profile", JSON.stringify(profile));
+  alert("บันทึกโปรไฟล์เรียบร้อยแล้ว!");
+  closeProfile();
+}
+
+// โหลดข้อมูลเก่ามาแสดง
+window.onload = function(){
+  const saved = localStorage.getItem("profile");
+  if(saved){
+    const profile = JSON.parse(saved);
+    document.getElementById("username").value = profile.username;
+    document.getElementById("address").value = profile.address;
+    document.getElementById("phone").value = profile.phone;
+    document.getElementById("email").value = profile.email;
+    if(profile.image){
+      document.getElementById("profileImage").src = profile.image;
+    }
+  }
+}
+</script>
+
+
+  <div class="content" id="add" style="display:none">
+    <h1>ลงสินค้า</h1>
+    <input type="text" id="pname" placeholder="ชื่อสินค้า">
+    <input type="number" id="pprice" placeholder="ราคา">
+    <textarea id="pdesc" placeholder="รายละเอียด"></textarea>
+    <input type="text" id="pcontact" placeholder="ช่องทางติดต่อ">
+    <input type="file" id="pimages" multiple accept="image/*">
+    <button onclick="addProduct()">บันทึกสินค้า</button>
+  </div>
+
+  <div class="content" id="my" style="display:none">
+    <h1>สินค้าของคุณ</h1>
+    <div id="myProducts"></div>
+  </div>
+
+  <!-- ไอคอน Admin -->
+  <div class="admin-icon" onclick="toggleAdmin()">⚙</div>
+  <div class="admin-panel" id="adminPanel">
+    <h3>Admin</h3>
+    <input type="password" id="adminPass" placeholder="รหัสผ่าน">
+    <button onclick="loginAdmin()">เข้าสู่ระบบ</button>
+    <div id="adminActions" style="display:none">
+      <h4>ลบโพสต์</h4>
+      <div id="adminProducts"></div>
+    </div>
+  </div>
+
+<script>
+let products = JSON.parse(localStorage.getItem("products")||"[]");
+let banned = ["ควย","หี","หำ","แตด","แม่มึง","พ่อมึง","ตาย","พ่อมึงตาย","แม่มึงตาย"];
+let admin = false;
+
+function toggleMenu(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
+function showPage(page){
+  document.getElementById("home").style.display="none";
+  document.getElementById("add").style.display="none";
+  document.getElementById("my").style.display="none";
+  document.getElementById(page).style.display="block";
+  if(page==="home") renderProducts();
+  if(page==="my") renderMyProducts();
+}
+function addProduct(){
+  let name=document.getElementById("pname").value;
+  let price=document.getElementById("pprice").value;
+  let desc=document.getElementById("pdesc").value;
+  let contact=document.getElementById("pcontact").value;
+  let files=document.getElementById("pimages").files;
+
+  // ตรวจคำหยาบ
+  for(let word of banned){ 
+    if(name.includes(word)||desc.includes(word)){ 
+      alert("พบคำไม่เหมาะสม"); 
+      return; 
+    }
+  }
+
+  let readerPromises = [];
+  for(let i=0;i<Math.min(files.length,5);i++){
+    let file=files[i];
+    readerPromises.push(new Promise(res=>{
+      let r=new FileReader();
+      r.onload=e=>res(e.target.result);
+      r.readAsDataURL(file);
+    }));
+  }
+  Promise.all(readerPromises).then(images=>{
+    let product={id:Date.now(),name,price,desc,contact,images,comments:[]};
+    products.push(product);
+    localStorage.setItem("products",JSON.stringify(products));
+    alert("เพิ่มสินค้าแล้ว");
+    showPage("home");
+  });
+}
+function renderProducts(){
+  let q=document.getElementById("search").value.toLowerCase();
+  let list=document.getElementById("productList");
+  list.innerHTML="";
+  products.filter(p=>p.name.toLowerCase().includes(q)).forEach(p=>{
+    let div=document.createElement("div");
+    div.className="product";
+    let mainImg = p.images[0] || "";
+    div.innerHTML=`
+      <h3>${p.name} - ${p.price} บาท</h3>
+      ${mainImg?`<img src="${mainImg}">`:""}
+      <p>${p.desc}</p>
+      <p>ติดต่อ: ${p.contact}</p>
+      <div class="thumbs">${p.images.map((img,i)=>`<img src="${img}" onclick="this.closest('.product').querySelector('img').src='${img}'">`).join("")}</div>
+      <div class="comments">
+        <h4>คอมเมนต์</h4>
+        <div id="cmt${p.id}">${p.comments.map(c=>`<div class="comment">${c}</div>`).join("")}</div>
+        <input type="text" id="input${p.id}" placeholder="เขียนคอมเมนต์...">
+        <button onclick="addComment(${p.id})">ส่ง</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+function addComment(id){
+  let input=document.getElementById("input"+id);
+  let text=input.value;
+  if(!text) return;
+  for(let word of banned){ if(text.includes(word)) return alert("ข้อความไม่เหมาะสม"); }
+  let p=products.find(x=>x.id===id);
+  p.comments.push(text);
+  localStorage.setItem("products",JSON.stringify(products));
+  renderProducts();
+}
+function renderMyProducts(){
+  let list=document.getElementById("myProducts");
+  list.innerHTML="";
+  products.forEach(p=>{
+    let div=document.createElement("div");
+    div.className="product";
+    div.innerHTML=`
+      <h3>${p.name} - ${p.price} บาท</h3>
+      <button onclick="soldProduct(${p.id})">ขายแล้ว</button>
+    `;
+    list.appendChild(div);
+  });
+}
+function soldProduct(id){
+  products=products.filter(p=>p.id!==id);
+  localStorage.setItem("products",JSON.stringify(products));
+  renderMyProducts();
+  renderProducts();
+}
+function toggleAdmin(){
+  document.getElementById("adminPanel").style.display="block";
+}
+function loginAdmin(){
+  let pass=document.getElementById("adminPass").value;
+  if(pass==="23032551"){ 
+    admin=true;
+    document.getElementById("adminActions").style.display="block";
+    renderAdmin();
+  } else { alert("รหัสผิด"); }
+}
+function renderAdmin(){
+  let list=document.getElementById("adminProducts");
+  list.innerHTML="";
+  products.forEach(p=>{
+    let div=document.createElement("div");
+    div.innerHTML=`${p.name} <button onclick="deleteProduct(${p.id})">ลบ</button>`;
+    list.appendChild(div);
+  });
+}
+function deleteProduct(id){
+  products=products.filter(p=>p.id!==id);
+  localStorage.setItem("products",JSON.stringify(products));
+  renderAdmin();
+  renderProducts();
+}
+renderProducts();
+</script>
+
+</body>
+</html>

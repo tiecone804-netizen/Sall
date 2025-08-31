@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feed</title>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+    }
+    nav {
+      background: #dd2476;
+      padding: 10px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    nav button {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* === Modal === */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      position: relative;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.9);}
+      to {opacity: 1; transform: scale(1);}
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      cursor: pointer;
+      color: #333;
+    }
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #dd2476;
+      margin: 10px auto;
+      display: block;
+      background: #eee;
+    }
+    .upload-label {
+      display: inline-block;
+      margin-top: 8px;
+      cursor: pointer;
+      color: #dd2476;
+      text-decoration: underline;
+      font-size: 14px;
+    }
+    #upload {
+      display: none;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    button.save {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #dd2476;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button.save:hover {
+      background: #c51466;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div>🌸 My Feed</div>
+    <button onclick="openProfile()">โปรไฟล์</button>
+  </nav>
+
+  <div style="padding:20px;">
+    <h2>Welcome Feed</h2>
+    <p>ข้อมูลบัญชีจะโชว์ที่นี่…</p>
+  </div>
+
+  <!-- === Modal Popup โปรไฟล์ === -->
+  <div id="profileModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeProfile()">&times;</span>
+      
+      <!-- วงกลมโปรไฟล์ -->
+      <img id="profileImage" class="profile-pic" src="https://via.placeholder.com/120x120.png?text=+" alt="Profile">
+      <label for="upload" class="upload-label">อัปโหลดรูปโปรไฟล์</label>
+      <input type="file" id="upload" accept="image/*">
+
+      <h2>โปรไฟล์ของฉัน</h2>
+      <form onsubmit="updateProfile(event)">
+        <input type="text" id="username" placeholder="ชื่อผู้ใช้" required><br>
+        <input type="email" id="email" placeholder="อีเมล" required><br>
+        <input type="text" id="address" placeholder="ที่อยู่" required><br>
+        <button type="submit" class="save">บันทึก</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = localStorage.getItem("currentUser");
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+    let user = users.find(u => u.username === currentUser);
+
+    function openProfile() {
+      document.getElementById("profileModal").style.display = "flex";
+      if (user) {
+        document.getElementById("username").value = user.username || "";
+        document.getElementById("email").value = user.email || "";
+        document.getElementById("address").value = user.address || "";
+        if (user.profileImage) {
+          document.getElementById("profileImage").src = user.profileImage;
+        }
+      }
+    }
+    function closeProfile() {
+      document.getElementById("profileModal").style.display = "none";
+    }
+
+    document.getElementById("upload").addEventListener("change", function(event) {
+      let file = event.target.files[0];
+      if (file) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById("profileImage").src = e.target.result;
+          user.profileImage = e.target.result;
+          localStorage.setItem("users", JSON.stringify(users));
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function updateProfile(e) {
+      e.preventDefault();
+      user.username = document.getElementById("username").value;
+      user.email = document.getElementById("email").value;
+      user.address = document.getElementById("address").value;
+      localStorage.setItem("users", JSON.stringify(users));
+      localStorage.setItem("currentUser", user.username);
+      alert("บันทึกโปรไฟล์สำเร็จ!");
+      closeProfile();
+    }
+  </script>
+</body>
+</html>

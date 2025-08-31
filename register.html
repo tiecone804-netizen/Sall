@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <link rel="stylesheet" href="responsive.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สมัครสมาชิก</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Tahoma, sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(-45deg, #0015FF,#1F2024,#581FC6,#3A373F);
+      background-size: 400% 400%;
+      animation: gradientBG 10s ease infinite;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .container {
+      background: rgba(0,0,0,0.7);
+      padding: 30px;
+      border-radius: 15px;
+      width: 320px;
+      text-align: center;
+      color: #fff;
+    }
+    .container h2 {
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #33b5e5;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0099cc;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>สมัครสมาชิก</h2>
+    <form onsubmit="register(event)">
+      <input type="text" id="regUsername" placeholder="ชื่อผู้ใช้" required>
+      <input type="password" id="regPassword" placeholder="รหัสผ่าน" required>
+      <input type="email" id="regEmail" placeholder="อีเมล" required>
+      <input type="text" id="regPhone" placeholder="เบอร์โทรศัพท์" required>
+      <button type="submit">สมัคร</button>
+    </form>
+  </div>
+
+  <script>
+    function register(e) {
+      e.preventDefault();
+      const username = document.getElementById("regUsername").value;
+      const password = document.getElementById("regPassword").value;
+      const email = document.getElementById("regEmail").value;
+      const phone = document.getElementById("regPhone").value;
+
+      const user = {
+        username: username,
+        password: password,
+        email: email,
+        phone: phone
+      };
+
+      localStorage.setItem(username, JSON.stringify(user));
+      alert("สมัครสมาชิกสำเร็จ!");
+      window.location.href = "fet.html"; 
+      window.location.href = "home.html";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>บัญชีผู้ใช้ทั้งหมด</title>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(270deg, #6a11cb, #2575fc);
+      background-size: 400% 400%;
+      animation: gradientMove 10s ease infinite;
+      color: #fff;
+    }
+    @keyframes gradientMove {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: rgba(255,255,255,0.2);
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>รายชื่อบัญชีที่สมัคร</h2>
+    <div id="userList"></div>
+  </div>
+
+  <script>
+    function showUsers() {
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+      let listDiv = document.getElementById("userList");
+
+      if (users.length === 0) {
+        listDiv.innerHTML = "<p>ยังไม่มีผู้ใช้</p>";
+        return;
+      }
+
+      let html = "<ul>";
+      users.forEach(user => {
+        html += `<li><b>${user.username}</b><br>📧 ${user.email}<br>📍 ${user.address}</li>`;
+      });
+      html += "</ul>";
+
+      listDiv.innerHTML = html;
+    }
+
+    showUsers();
+  </script>
+</body>
+</html>
